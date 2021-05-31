@@ -37,15 +37,26 @@ with open('test.bib', mode='w') as file_object:
         result = cur.fetchone()
         deserializedItem = json.loads(result[0])
 
-        author  = deserializedItem["article"]["authors"]
+        authors = deserializedItem["article"]["authors"]
         title   = deserializedItem["article"]["title"]
         year    = deserializedItem["article"]["year"]
         journal = deserializedItem["article"]["journal"]
         citekey = deserializedItem["user_data"]["citekey"]
 
+        authorlineList = []
+        for indivAuthor in authors:
+            print(indivAuthor)
+            *indivAuthorGivenNames, indivAuthorLastName = indivAuthor.split(" ")
+            print("Last name: " + indivAuthorLastName)
+            print("Given names: " + ' '.join(indivAuthorGivenNames))
+            print("\n")
+            authorlineList.append(indivAuthorLastName + ', ' + ' '.join(indivAuthorGivenNames))
+        authorline = ' and '.join(authorlineList)
+        print(authorline)
+
         #print(citekey + author[0] + title + str(year), sep=' ')
         #print(citekey + author[0] + title + str(year), file=file_object)
-        bibEntry = bibEntryTemplate.format(citekey=citekey,year=year,title=title,journal=journal, authorline='')
+        bibEntry = bibEntryTemplate.format(citekey=citekey,year=year,title=title,journal=journal, authorline=authorline)
         print(bibEntry)
         print(bibEntry, file=file_object)
 
