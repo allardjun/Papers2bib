@@ -20,18 +20,33 @@ item_ids = deserialized["item_ids"]
 #print(item_ids)
 #print(type(item_ids))
 
-# Get individual papers from the ReadCube list
-for item_id in item_ids:
-    print(item_id)
-    cur.execute("SELECT json FROM items WHERE id = '" + item_id + "'")
-    result = cur.fetchone()
-    deserializedItem = json.loads(result[0])
+bibEntryTemplate = """
+@article{{{citekey},
+year = {{{year}}},
+title = {{{title}}},
+author = {{{authorline}}},
+journal = {{{journal}}}
+}}"""
 
-    author = deserializedItem["article"]["authors"]
-    title = deserializedItem["article"]["title"]
-    year = deserializedItem["article"]["year"]
-    citekey = deserializedItem["user_data"]["citekey"]
+with open('test.bib', mode='w') as file_object:
 
-    print(citekey + author[0] + title + str(year))
+    # Get individual papers from the ReadCube list
+    for item_id in item_ids:
+        print(item_id)
+        cur.execute("SELECT json FROM items WHERE id = '" + item_id + "'")
+        result = cur.fetchone()
+        deserializedItem = json.loads(result[0])
 
-    print("\n")
+        author  = deserializedItem["article"]["authors"]
+        title   = deserializedItem["article"]["title"]
+        year    = deserializedItem["article"]["year"]
+        journal = deserializedItem["article"]["journal"]
+        citekey = deserializedItem["user_data"]["citekey"]
+
+        #print(citekey + author[0] + title + str(year), sep=' ')
+        #print(citekey + author[0] + title + str(year), file=file_object)
+        bibEntry = bibEntryTemplate.format(citekey=citekey,year=year,title=title,journal=journal, authorline='')
+        print(bibEntry)
+        print(bibEntry, file=file_object)
+
+        print("\n")
